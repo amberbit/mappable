@@ -1,9 +1,47 @@
 defmodule Mappable do
-  def to_map(struct_or_map, options) do
-    case Map.has_key?(struct_or_map, :__struct__) do
-      true -> Map.from_struct(struct_or_map)
-      false -> struct_or_map
-    end |> Enum.reduce(%{}, fn ({k, v}, acc) -> Map.put(acc, convert_key(k, options[:keys]), v) end)
+  def to_map(list, options) when is_list(list) do
+    list
+    |> Enum.into(%{}, fn {key, val} -> {convert_key(key, options[:keys]), val} end)
+  end
+
+  def to_map(%_module{} = struct, options) do
+    Map.from_struct(struct) |> convert_keys(options[:keys])
+  end
+
+  def to_map(map, options) when is_map(map) do
+    map |> convert_keys(options[:keys])
+  end
+
+  def to_struct(map, struct_module) when is_atom(struct_module) and is_map(map) do
+    map = to_map(map, keys: :strings)
+    struct = struct(struct_module)
+
+    Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+      case Map.fetch(map, convert_key(k, :strings)) do
+        {:ok, v} -> %{acc | k => v}
+        :error -> acc
+      end
+    end
+  end
+
+  def to_list(list) when is_list(list) do
+    list
+  end
+
+  def to_list(map) when is_map(map) do
+    Enum.map(map, fn({k, v}) -> {String.to_atom(k), v} end)
+  end
+
+  defp convert_keys(map, keys_as) do
+    Enum.reduce(map, %{}, fn ({k, v}, acc) -> Map.put(acc, convert_key(k, keys_as), convert_val(v, keys_as)) end)
+  end
+
+  defp convert_val(val, keys_as) when is_map(val) do
+    to_map(val, keys: keys_as)
+  end
+
+  defp convert_val(val, _) do
+    val
   end
 
   defp convert_key(k, :atoms) when is_atom(k) do
@@ -14,19 +52,8 @@ defmodule Mappable do
     String.to_atom(k)
   end
 
-  defp convert_key(k, :strings) do
+  defp convert_key(k, :strings) when is_atom(k) or is_binary(k) do
     "#{k}"
-  end
-
-  def to_struct(map, struct_module) when is_atom(struct_module) do
-    struct = struct(struct_module)
-
-    Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
-      case Map.fetch(to_map(map, keys: :strings), convert_key(k, :strings)) do
-        {:ok, v} -> %{acc | k => v}
-        :error -> acc
-      end
-    end
   end
 end
 
