@@ -12,9 +12,12 @@ defmodule Mappable do
     map |> convert_keys(options[:keys])
   end
 
-  def to_struct(map, struct_module) when is_atom(struct_module) and is_map(map) do
+  # I think this has been stolen from a Google group answer by Jose Valim and
+  # modified
+  # https://groups.google.com/forum/#!msg/elixir-lang-talk/6geXOLUeIpI/L9einu4EEAAJ
+  def to_struct(map, module) when is_atom(module) and is_map(map) do
     map = to_map(map, keys: :strings)
-    struct = struct(struct_module)
+    struct = struct(module)
 
     Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
       case Map.fetch(map, convert_key(k, :strings)) do
