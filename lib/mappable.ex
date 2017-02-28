@@ -55,7 +55,11 @@ defmodule Mappable do
     String.to_atom(k)
   end
 
-  defp convert_key(k, :strings) when is_atom(k) or is_binary(k) do
+  defp convert_key(k, :strings) when is_binary(k) do
+    k
+  end
+
+  defp convert_key(k, :strings) when is_atom(k) do
     "#{k}"
   end
 end
