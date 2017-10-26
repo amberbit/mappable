@@ -9,7 +9,7 @@ end
 defmodule MappableTest do
   use ExUnit.Case
 
-  describe "to_map/2 with strings" do
+  describe "to_map/3 with strings" do
     test "converts to Map with String keys by default" do
       original = %{:foo => :bar}
       converted = Mappable.to_map(original, keys: :strings)
@@ -44,9 +44,23 @@ defmodule MappableTest do
 
       assert converted == %{"foo" => :bar}
     end
+
+    test "converts recursively by default" do
+      original = %TestStruct{:foo => %TestStruct{:foo => :bar}}
+      converted = Mappable.to_map(original, keys: :strings)
+
+      assert converted == %{"foo" => %{"foo" => :bar}}
+    end
+
+    test "converts in shallow mode if requested" do
+      original = %TestStruct{:foo => %TestStruct{:foo => :bar}}
+      converted = Mappable.to_map(original, keys: :strings, shallow: true)
+
+      assert converted == %{"foo" => %TestStruct{:foo => :bar}}
+    end
   end
 
-  describe "to_map/2 with atoms" do
+  describe "to_map/3 with atoms" do
     test "converts to Map with Atom keys if passed such option" do
       original = %{"foo" => :bar}
       converted = Mappable.to_map(original, keys: :atoms)

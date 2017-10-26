@@ -9,11 +9,11 @@ defmodule Mappable do
   end
 
   def to_map(%_module{} = struct, options) do
-    Map.from_struct(struct) |> convert_keys(options[:keys])
+    Map.from_struct(struct) |> convert_keys(options[:keys], options[:shallow] || false)
   end
 
   def to_map(map, options) when is_map(map) do
-    map |> convert_keys(options[:keys])
+    map |> convert_keys(options[:keys], options[:shallow] || false)
   end
 
   def to_struct(nil, _module) do
@@ -24,7 +24,7 @@ defmodule Mappable do
   # modified
   # https://groups.google.com/forum/#!msg/elixir-lang-talk/6geXOLUeIpI/L9einu4EEAAJ
   def to_struct(map, module) when is_atom(module) and is_map(map) do
-    map = to_map(map, keys: :strings)
+    map = to_map(map, keys: :strings, shallow: true)
     struct = struct(module)
 
     Enum.reduce(Map.to_list(struct), struct, fn {k, _}, acc ->
@@ -59,9 +59,17 @@ defmodule Mappable do
     Keyword.keys(list)
   end
 
-  defp convert_keys(map, keys_as) do
+  defp convert_keys(map, keys_as, shallow?) do
     Enum.reduce(map, %{}, fn {k, v}, acc ->
-      Map.put(acc, convert_key(k, keys_as), convert_val(v, keys_as))
+      Map.put(
+        acc,
+        convert_key(k, keys_as),
+        if shallow? do
+          v
+        else
+          convert_val(v, keys_as)
+        end
+      )
     end)
   end
 
