@@ -9,7 +9,7 @@ end
 defmodule MappableTest do
   use ExUnit.Case
 
-  describe "to_map(something, keys: :strings)" do
+  describe "to_map/2 with strings" do
     test "converts to Map with String keys by default" do
       original = %{:foo => :bar}
       converted = Mappable.to_map(original, keys: :strings)
@@ -46,7 +46,7 @@ defmodule MappableTest do
     end
   end
 
-  describe "to_map(something, keys: :atoms)" do
+  describe "to_map/2 with atoms" do
     test "converts to Map with Atom keys if passed such option" do
       original = %{"foo" => :bar}
       converted = Mappable.to_map(original, keys: :atoms)
@@ -76,7 +76,7 @@ defmodule MappableTest do
     end
   end
 
-  describe "to_struct(something, struct_type)" do
+  describe "to_struct/2" do
     test "converts Map with String keys to struct" do
       original = %{"foo" => :bar}
       converted = Mappable.to_struct(original, TestStruct)
@@ -106,7 +106,7 @@ defmodule MappableTest do
     end
   end
 
-  describe "to_list(something)" do
+  describe "to_list/1" do
     test "converts maps with String keys" do
       original = %{"foo" => :bar, "bar" => :foo}
       converted = Mappable.to_list(original)
@@ -126,6 +126,26 @@ defmodule MappableTest do
       converted = Mappable.to_list(original)
 
       assert converted == [foo: :bar, bar: :foo]
+    end
+  end
+
+  describe "keys/1" do
+    test "returns keys from structs" do
+      keys = Mappable.keys(%TestStruct2{})
+      assert keys == [:bar, :foo]
+    end
+
+    test "returns keys from lists" do
+      keys = Mappable.keys(first: :item, second: :item)
+      assert keys == [:first, :second]
+    end
+
+    test "returns keys from maps" do
+      keys = Mappable.keys(%{bar: 1, foo: 2})
+      assert keys == [:bar, :foo]
+
+      keys = Mappable.keys(%{"bar" => 1, "foo" => 2})
+      assert keys == ["bar", "foo"]
     end
   end
 end

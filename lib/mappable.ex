@@ -35,6 +35,18 @@ defmodule Mappable do
     Enum.map(map, fn {k, v} -> {String.to_atom(k), v} end)
   end
 
+  def keys(%_module{} = struct) do
+    Map.keys(struct) -- [:__struct__]
+  end
+
+  def keys(map) when is_map(map) do
+    Map.keys(map)
+  end
+
+  def keys(list) when is_list(list) do
+    Keyword.keys(list)
+  end
+
   defp convert_keys(map, keys_as) do
     Enum.reduce(map, %{}, fn {k, v}, acc ->
       Map.put(acc, convert_key(k, keys_as), convert_val(v, keys_as))
