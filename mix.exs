@@ -4,25 +4,31 @@ defmodule Mappable.Mixfile do
   @version "0.0.1"
 
   def project do
-    [app: :mappable,
-     description: "Convert different mappable types to each other in Elixir",
-     version: @version,
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     name: "Mappable",
-     package: package(),
-     docs: [source_ref: "v#{@version}",
-       main: "readme",
-       source_url: "https://github.com/amberbit/mappable",
-       extras: ["README.md"]],
-     deps: deps()]
+    [
+      app: :mappable,
+      description: "Convert different mappable types to each other in Elixir",
+      version: @version,
+      elixir: "~> 1.4",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      name: "Mappable",
+      package: package(),
+      docs: [
+        source_ref: "v#{@version}",
+        main: "readme",
+        source_url: "https://github.com/amberbit/mappable",
+        extras: ["README.md"]
+      ],
+      deps: deps()
+    ]
   end
 
   def package do
-    [maintainers: ["Hubert Łępicki"],
+    [
+      maintainers: ["Hubert Łępicki"],
       licenses: ["New BSD"],
-      links: %{"GitHub" => "https://github.com/amberbit/mappable"}]
+      links: %{"GitHub" => "https://github.com/amberbit/mappable"}
+    ]
   end
 
   # Configuration for the OTP application
@@ -44,8 +50,7 @@ defmodule Mappable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.14", only: :dev},
+      {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
-
 end

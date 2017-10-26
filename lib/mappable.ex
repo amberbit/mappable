@@ -19,12 +19,12 @@ defmodule Mappable do
     map = to_map(map, keys: :strings)
     struct = struct(module)
 
-    Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+    Enum.reduce(Map.to_list(struct), struct, fn {k, _}, acc ->
       case Map.fetch(map, convert_key(k, :strings)) do
         {:ok, v} -> %{acc | k => v}
         :error -> acc
       end
-    end
+    end)
   end
 
   def to_list(list) when is_list(list) do
@@ -32,11 +32,13 @@ defmodule Mappable do
   end
 
   def to_list(map) when is_map(map) do
-    Enum.map(map, fn({k, v}) -> {String.to_atom(k), v} end)
+    Enum.map(map, fn {k, v} -> {String.to_atom(k), v} end)
   end
 
   defp convert_keys(map, keys_as) do
-    Enum.reduce(map, %{}, fn ({k, v}, acc) -> Map.put(acc, convert_key(k, keys_as), convert_val(v, keys_as)) end)
+    Enum.reduce(map, %{}, fn {k, v}, acc ->
+      Map.put(acc, convert_key(k, keys_as), convert_val(v, keys_as))
+    end)
   end
 
   defp convert_val(val, keys_as) when is_map(val) do
@@ -63,4 +65,3 @@ defmodule Mappable do
     "#{k}"
   end
 end
-
