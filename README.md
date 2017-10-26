@@ -42,7 +42,7 @@ by adding `mappable` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:mappable, "~> 0.0.1"}]
+  [{:mappable, "~> 0.2.0"}]
 end
 ```
 
