@@ -1,4 +1,8 @@
 defmodule Mappable do
+  def to_map(nil) do
+    nil
+  end
+
   def to_map(list, options) when is_list(list) do
     list
     |> Enum.into(%{}, fn {key, val} -> {convert_key(key, options[:keys]), val} end)
@@ -10,6 +14,10 @@ defmodule Mappable do
 
   def to_map(map, options) when is_map(map) do
     map |> convert_keys(options[:keys])
+  end
+
+  def to_struct(nil, _module) do
+    nil
   end
 
   # I think this has been stolen from a Google group answer by Jose Valim and
@@ -25,6 +33,10 @@ defmodule Mappable do
         :error -> acc
       end
     end)
+  end
+
+  def to_list(nil) do
+    nil
   end
 
   def to_list(list) when is_list(list) do

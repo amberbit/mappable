@@ -74,6 +74,10 @@ defmodule MappableTest do
 
       assert converted == %{:foo => :bar}
     end
+
+    test "preserves nil" do
+      assert Mappable.to_map(nil) == nil
+    end
   end
 
   describe "to_struct/2" do
@@ -104,6 +108,10 @@ defmodule MappableTest do
 
       assert converted == %TestStruct{foo: :bar}
     end
+
+    test "preserves nil" do
+      assert Mappable.to_struct(nil, TestStruct) == nil
+    end
   end
 
   describe "to_list/1" do
@@ -126,6 +134,10 @@ defmodule MappableTest do
       converted = Mappable.to_list(original)
 
       assert converted == [foo: :bar, bar: :foo]
+    end
+
+    test "preserves nil" do
+      assert Mappable.to_list(nil) == nil
     end
   end
 
