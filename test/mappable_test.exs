@@ -153,6 +153,13 @@ defmodule MappableTest do
     test "preserves nil" do
       assert Mappable.to_list(nil) == nil
     end
+
+    test "converts maps with Atom keys" do
+      original = %{foo: :bar, bar: :foo}
+      converted = Mappable.to_list(original)
+
+      assert converted == [bar: :foo, foo: :bar]
+    end
   end
 
   describe "keys/1" do

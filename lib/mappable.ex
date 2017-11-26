@@ -44,8 +44,11 @@ defmodule Mappable do
   end
 
   def to_list(map) when is_map(map) do
-    Enum.map(map, fn {k, v} -> {String.to_atom(k), v} end)
+    Enum.map(map, fn {k, v} -> {to_atom(k), v} end)
   end
+
+  defp to_atom(k) when is_atom(k), do: k
+  defp to_atom(k) when is_binary(k), do: String.to_atom(k)
 
   def keys(%_module{} = struct) do
     Map.keys(struct) -- [:__struct__]
