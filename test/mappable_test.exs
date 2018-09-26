@@ -31,6 +31,13 @@ defmodule MappableTest do
       assert converted == %{"foo" => %{"bar" => :baz}}
     end
 
+    test "converts nested Maps recursively with lists in between" do
+      original = %{:foo => [%{:bar => :baz}]}
+      converted = Mappable.to_map(original, keys: :strings)
+
+      assert converted == %{"foo" => [%{"bar" => :baz}]}
+    end
+
     test "converts Struct to Map" do
       original = %TestStruct{:foo => :bar}
       converted = Mappable.to_map(original, keys: :strings)

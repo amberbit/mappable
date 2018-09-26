@@ -1,7 +1,7 @@
 defmodule Mappable.Mixfile do
   use Mix.Project
 
-  @version "0.2.3"
+  @version "0.2.4"
 
   def project do
     [
@@ -50,7 +50,7 @@ defmodule Mappable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.14", only: :dev}
+      {:ex_doc, "~> 0.19", only: :dev}
     ]
   end
 end

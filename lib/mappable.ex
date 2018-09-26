@@ -1,4 +1,8 @@
 defmodule Mappable do
+  @moduledoc """
+    TODO: Add module doc
+  """
+
   def to_map(nil) do
     nil
   end
@@ -78,6 +82,10 @@ defmodule Mappable do
 
   defp convert_val(val, keys_as) when is_map(val) do
     to_map(val, keys: keys_as)
+  end
+
+  defp convert_val(val, keys_as) when is_list(val) do
+    val |> Enum.map(fn item -> convert_val(item, keys_as) end)
   end
 
   defp convert_val(val, _) do
