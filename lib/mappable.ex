@@ -52,7 +52,7 @@ defmodule Mappable do
   end
 
   defp to_atom(k) when is_atom(k), do: k
-  defp to_atom(k) when is_binary(k), do: String.to_atom(k)
+  defp to_atom(k) when is_binary(k), do: String.to_existing_atom(k)
 
   def keys(%_module{} = struct) do
     Map.keys(struct) -- [:__struct__]
@@ -97,7 +97,7 @@ defmodule Mappable do
   end
 
   defp convert_key(k, :atoms) when is_binary(k) do
-    String.to_atom(k)
+    String.to_existing_atom(k)
   end
 
   defp convert_key(k, :strings) when is_binary(k) do
