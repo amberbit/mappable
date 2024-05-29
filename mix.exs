@@ -1,14 +1,14 @@
 defmodule Mappable.Mixfile do
   use Mix.Project
 
-  @version "0.2.4"
+  @version "0.3.0"
 
   def project do
     [
       app: :mappable,
       description: "Convert different mappable types to each other in Elixir",
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       name: "Mappable",
@@ -26,7 +26,7 @@ defmodule Mappable.Mixfile do
   def package do
     [
       maintainers: ["Hubert Łępicki"],
-      licenses: ["New BSD"],
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/amberbit/mappable"}
     ]
   end
@@ -50,7 +50,7 @@ defmodule Mappable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.19", only: :dev}
+      {:ex_doc, "~> 0.33", only: :dev}
     ]
   end
 end

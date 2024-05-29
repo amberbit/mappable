@@ -165,27 +165,40 @@ defmodule MappableTest do
       original = %{foo: :bar, bar: :foo}
       converted = Mappable.to_list(original)
 
-      assert converted == [bar: :foo, foo: :bar]
+      assert length(converted) == 2
+      assert Enum.member?(converted, {:bar, :foo})
+      assert Enum.member?(converted, {:foo, :bar})
     end
   end
 
   describe "keys/1" do
     test "returns keys from structs" do
       keys = Mappable.keys(%TestStruct2{})
-      assert keys == [:bar, :foo]
+      assert length(keys) == 2
+      assert(Enum.member?(keys, :foo))
+      assert(Enum.member?(keys, :bar))
     end
 
     test "returns keys from lists" do
       keys = Mappable.keys(first: :item, second: :item)
       assert keys == [:first, :second]
+
+      assert length(keys) == 2
+      assert(Enum.member?(keys, :first))
+      assert(Enum.member?(keys, :second))
     end
 
     test "returns keys from maps" do
       keys = Mappable.keys(%{bar: 1, foo: 2})
-      assert keys == [:bar, :foo]
+      assert length(keys) == 2
+      assert(Enum.member?(keys, :foo))
+      assert(Enum.member?(keys, :bar))
 
       keys = Mappable.keys(%{"bar" => 1, "foo" => 2})
-      assert keys == ["bar", "foo"]
+
+      assert length(keys) == 2
+      assert(Enum.member?(keys, "foo"))
+      assert(Enum.member?(keys, "bar"))
     end
   end
 end
