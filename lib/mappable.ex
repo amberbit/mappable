@@ -1,4 +1,6 @@
 defmodule Mappable do
+  require Logger
+
   @moduledoc """
     TODO: Add module doc
   """
@@ -7,17 +9,32 @@ defmodule Mappable do
     nil
   end
 
+  @default_options [
+    keys: :atoms,
+    shallow: false,
+    skip_unknown_atoms: false,
+    warn_unknown_atoms: true
+  ]
+
+  defp expand_options(options) do
+    Keyword.merge(@default_options, options)
+  end
+
   def to_map(list, options) when is_list(list) do
+    options = expand_options(options)
+
     list
     |> Enum.into(%{}, fn {key, val} -> {convert_key(key, options[:keys]), val} end)
   end
 
   def to_map(%_module{} = struct, options) do
-    Map.from_struct(struct) |> convert_keys(options[:keys], options[:shallow] || false)
+    options = expand_options(options)
+    Map.from_struct(struct) |> convert_keys(options)
   end
 
   def to_map(map, options) when is_map(map) do
-    map |> convert_keys(options[:keys], options[:shallow] || false)
+    options = expand_options(options)
+    map |> convert_keys(options)
   end
 
   def to_struct(nil, _module) do
@@ -66,26 +83,41 @@ defmodule Mappable do
     Keyword.keys(list)
   end
 
-  defp convert_keys(map, keys_as, shallow?) do
+  defp convert_keys(map, options) do
     Enum.reduce(map, %{}, fn {k, v}, acc ->
-      Map.put(
-        acc,
-        convert_key(k, keys_as),
-        if shallow? do
-          v
-        else
-          convert_val(v, keys_as)
-        end
-      )
+      try do
+        Map.put(
+          acc,
+          convert_key(k, options[:keys]),
+          if options[:shallow] do
+            v
+          else
+            convert_val(v, options)
+          end
+        )
+      rescue
+        _e in ArgumentError ->
+          if options[:skip_unknown_atoms] do
+            if options[:warn_unknown_atoms] do
+              Logger.warning(
+                "[Mappable] failed to convert key #{inspect(k)} to existing atom, skipping this key entirely"
+              )
+            end
+
+            acc
+          else
+            raise ArgumentError, "failed to convert key #{inspect(k)} to existing atom"
+          end
+      end
     end)
   end
 
-  defp convert_val(val, keys_as) when is_map(val) do
-    to_map(val, keys: keys_as)
+  defp convert_val(val, options) when is_map(val) do
+    to_map(val, options)
   end
 
-  defp convert_val(val, keys_as) when is_list(val) do
-    val |> Enum.map(fn item -> convert_val(item, keys_as) end)
+  defp convert_val(val, options) when is_list(val) do
+    val |> Enum.map(fn item -> convert_val(item, options) end)
   end
 
   defp convert_val(val, _) do

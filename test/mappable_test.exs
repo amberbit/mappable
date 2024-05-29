@@ -9,6 +9,8 @@ end
 defmodule MappableTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureLog
+
   describe "to_map/3 with strings" do
     test "converts to Map with String keys by default" do
       original = %{:foo => :bar}
@@ -73,6 +75,41 @@ defmodule MappableTest do
       converted = Mappable.to_map(original, keys: :atoms)
 
       assert converted == %{:foo => :bar}
+    end
+
+    test "crashes by default on Atoms that are not in the system" do
+      original = %{"there_is_no_such_atom" => :bar}
+
+      assert_raise ArgumentError, fn ->
+        Mappable.to_map(original, keys: :atoms)
+      end
+    end
+
+    test "allows you to skip the atoms that do not exist in the system, with warning" do
+      original = %{"there_is_no_such_atom" => :bar, "bar" => :baz}
+
+      output =
+        capture_log(fn ->
+          converted = Mappable.to_map(original, keys: :atoms, skip_unknown_atoms: true)
+          assert converted == %{:bar => :baz}
+        end)
+
+      assert output =~
+               "[Mappable] failed to convert key \"there_is_no_such_atom\" to existing atom, skipping"
+
+      output =
+        capture_log(fn ->
+          converted =
+            Mappable.to_map(original,
+              keys: :atoms,
+              skip_unknown_atoms: true,
+              warn_unknown_atoms: false
+            )
+
+          assert converted == %{:bar => :baz}
+        end)
+
+      assert output == ""
     end
 
     test "converts nested Maps recursively" do
